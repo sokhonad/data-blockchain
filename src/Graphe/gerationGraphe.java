@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.graphstream.algorithm.Toolkit;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.DefaultGraph;
 
@@ -96,8 +97,7 @@ public class gerationGraphe {
         graphe.addEdge(ligne[0]+"-->"+ligne[1],ligne[0],ligne[1],true);
       }
     }
-    System.out.println("Nombre de noeud:"+graphe.getNodeCount());
-    System.out.println("Nombre de arret:"+graphe.getEdgeCount());
+    calculMetrique(graphe);
     System.setProperty("org.graphstream.ui", "swing");
     //graphe.display();
 
@@ -152,22 +152,33 @@ public class gerationGraphe {
             graphe1.addEdge(donnees.getTabDonnees().get(i).getSource()+"-->"+donnees.getTabDonnees().get(i).getTarget(),donnees.getTabDonnees().get(i).getSource(),donnees.getTabDonnees().get(i).getTarget(),true);
           }
         }
-
-
-
       }
-
 
       Thread.sleep( 1500);
       System.out.println("Nombre de noeud:"+graphe1.getNodeCount());
       compter+=graphe1.getNodeCount();
       graphe1.clear();
       debut+=taille;
-
     }
     System.out.println("compter:"+compter);
+  }
+  public static void calculMetrique( Graph graph) {
+	    System.out.println("Nombre de nœuds: "+graph.getNodeCount());
+	    System.out.println("Nombre de liens: "+graph.getEdgeCount());
+	    System.out.println("Degré moyen: "+Toolkit.averageDegree(graph));
+	    System.out.println("le coefficient de clustering: "+Toolkit.averageClusteringCoefficient(graph));
+	    System.out.println("isConnected: "+Toolkit.isConnected(graph));
+	    
+	    System.out.println("Distribution de degree");
+
+	    int[] tableauDistributionDegre=Toolkit.degreeDistribution(graph);
+	    for (int i = 0; i < tableauDistributionDegre.length; i++) {
+	    	System.out.println(tableauDistributionDegre[i]);
+
+		}
 
   }
+
 
 
 
@@ -184,8 +195,8 @@ public class gerationGraphe {
 
   public static void main(String[] args) throws Exception   {
     testTransformationCsvEnTxt();
-    //visualisationStatique(data, graphe);
-    visualisationDynamique(data, graphe,500000);
+    visualisationStatique(data, graphe);
+    //visualisationDynamique(data, graphe,500000);
 
 
   }
