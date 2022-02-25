@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +19,11 @@ public class gerationGraphe {
 
 	private final static String FILE_NAME_CSV = "Data/soc-sign-bitcoinalpha.csv";
 	private final static String FILE_NAME_TXT = "Data/soc-sign-bitcoinalpha.txt";
+	private final static String FILE_NAME_CSV_MSG = "Data/data.csv";
+	private final static String FILE_NAME_TXT_MSG = "Data/data.txt";
+	private  static String separateur;
+
+
 
 	private  static Graph graphe;
 	private static List<String> data;
@@ -55,21 +61,32 @@ public class gerationGraphe {
 
 		return result;
 	}
-	public static void transformationCsvEnTx(List<String> tab,String filename) throws Exception  {
+	public static void transformationCsvEnTx(List<String> tab,String filename,String separateur) throws Exception  {
 		String filepath = System.getProperty("user.dir") + File.separator + filename;
 		FileWriter fileWriter = new FileWriter(filepath);
 		BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
 
 		for (int i = 0; i < tab.size(); i++) {
 			String b=tab.get(i);
-			String[] ligne = b.split(",");          
-			for (int j = 0; j < ligne.length; j++) {
-				if(j<=1 || j==3) {
+			if (separateur==",") {
+				String[] ligne = b.split(",");          
+				for (int j = 0; j < ligne.length; j++) {
+					if(j<=1 || j==3) {
+						StringBuilder line = new StringBuilder();
+						line.append(ligne[j]).append(" ");
+						bufferedWriter.write(line + "");
+					}
+				}	
+			}else {
+				String[] ligne = b.split(" ");          
+				for (int j = 0; j < ligne.length; j++) {
 					StringBuilder line = new StringBuilder();
 					line.append(ligne[j]).append(" ");
 					bufferedWriter.write(line + "");
+
 				}
 			}
+
 			bufferedWriter.newLine();
 
 		}
@@ -81,7 +98,7 @@ public class gerationGraphe {
 		graphe=new DefaultGraph("graphe");
 		for (int i = 0; i < tab.size(); i++) {
 			String b=tab.get(i);
-			String[] ligne = b.split(",");
+			String[] ligne = b.split(separateur);
 			if(graphe.getNode(ligne[1])==null) {
 				graphe.addNode(ligne[1]);
 
@@ -94,7 +111,7 @@ public class gerationGraphe {
 
 		for (int i = 0; i < tab.size(); i++) {
 			String b=tab.get(i);
-			String[] ligne = b.split(",");
+			String[] ligne = b.split(separateur);
 			if(graphe.getEdge(ligne[0]+"-->"+ligne[1])==null) {
 				graphe.addEdge(ligne[0]+"-->"+ligne[1],ligne[0],ligne[1],true);
 			}
@@ -112,13 +129,12 @@ public class gerationGraphe {
 		//demarrager de comparaison de grapheTemp1 et grapheTemp2
 		int demarrer=-1;
 		int compter=0;
-		int sommetAtteint=-3;
 		//ajout des noeuds
 		donnees=new Donnees();
 		graphe=new DefaultGraph("graphe");
 		for (int i = 0; i < tab.size(); i++) {
 			String b=tab.get(i);
-			String[] ligne = b.split(",");
+			String[] ligne = b.split(separateur);
 			if(graphe.getNode(ligne[1])==null) {
 				graphe.addNode(ligne[1]);
 
@@ -131,20 +147,34 @@ public class gerationGraphe {
 		//ajout des sommets
 		for (int i = 0; i < tab.size(); i++) {
 			String b=tab.get(i);
-			String[] ligne = b.split(",");
+			String[] ligne = b.split(separateur);
 			if(graphe.getEdge(ligne[0]+"-->"+ligne[1])==null) {
 				graphe.addEdge(ligne[0]+"-->"+ligne[1],ligne[0],ligne[1],true);
-				donnees.init(ligne[0], ligne[1], ligne[2], ligne[3]);
+				if (separateur==",") {
+					donnees.init(ligne[0], ligne[1], ligne[2], ligne[3]);
+
+				}
+				if (separateur==" ") {
+					donnees.init(ligne[0], ligne[1], ligne[2], ligne[2]);
+
+				}
 			}
 		}
 		System.out.println(donnees.getTabDonnees().size());;
 		Graph graphe1=new DefaultGraph("graphe1");
 		System.setProperty("org.graphstream.ui", "swing");
 		// affichage graphe dynamique
+		int debut=0;
+		int fin=0;
 		//graphe1.display();
-		int debut=1289192400;
-		int fin=1453438800;
-		while(debut<=fin && sommetAtteint !=0) {
+		if (separateur==",") {
+			debut=1289192400;
+			fin=1453438800;
+		}else if(separateur==" ") {
+			debut=1082040961;
+			fin=1098777142;
+		}
+		while(debut<=fin ) {
 			for (int i = 0; i < donnees.getTabDonnees().size(); i++) {
 				if (donnees.getTabDonnees().get(i).getTime()>=debut && donnees.getTabDonnees().get(i).getTime()<=debut+taille ) {//intervalle temps
 					if(graphe1.getNode(donnees.getTabDonnees().get(i).getSource())==null) {
@@ -161,8 +191,7 @@ public class gerationGraphe {
 					}
 				}
 			}
-
-			Thread.sleep( 100);
+			Thread.sleep( 10);
 			//affichage nombre des noeuds graphe dynamique
 			//System.out.println("Nombre de noeud:"+graphe1.getNodeCount());
 			compter+=graphe1.getNodeCount();
@@ -177,13 +206,6 @@ public class gerationGraphe {
 			demarrer=0;
 			graphe1.clear();
 			debut+=taille;
-
-			if (debut-fin>0) {
-				debut=debut-taille;
-				sommetAtteint++;
-				System.out.println("**********************");
-
-			}
 		}
 		System.out.println("compter:"+compter);
 	}
@@ -252,10 +274,20 @@ public class gerationGraphe {
 	}
 
 	@SuppressWarnings("unused")
-	private static void testTransformationCsvEnTxt() throws Exception {
-		File f=getResource(FILE_NAME_CSV);
-		data = readFile(f);
-		transformationCsvEnTx(data,FILE_NAME_TXT);
+	private static void analyse(int numeroAnalyse) throws Exception {
+		//FILE_NAME_CSV_MSG
+		//FILE_NAME_TXT_MSG
+		if (numeroAnalyse==1) {
+			separateur=",";
+			File f=getResource(FILE_NAME_CSV);
+			data = readFile(f);
+			transformationCsvEnTx(data,FILE_NAME_TXT,",");
+		}else if(numeroAnalyse==2) {
+			separateur=" ";
+			File f=getResource(FILE_NAME_CSV_MSG);
+			data = readFile(f);
+			transformationCsvEnTx(data,FILE_NAME_TXT_MSG," ");
+		}
 	}
 
 	private static void affichageTableauRatio() {
@@ -265,13 +297,32 @@ public class gerationGraphe {
 		System.out.println("La taille tableauRatio: "+tableauRatio.size());
 	}
 
+	public static void writeData(String filename, List<Double> tab) {
+		try {
+			File file = new File(System.getProperty("user.dir") + "/" + filename);
+			// créer le fichier s'il n'existe pas
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+			FileWriter fw = new FileWriter(file.getAbsoluteFile());
+			BufferedWriter bw = new BufferedWriter(fw);
+			for (int i = 0 ; i < tab.size() ; i++) {
+				bw.write(tab.get(i)+"");
+				bw.newLine();
+			}
+			bw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 	public static void main(String[] args) throws Exception   {
-		testTransformationCsvEnTxt();
+		analyse(1);
 		//visualisationStatique(data, graphe);
-		visualisationDynamique(data, graphe, 5000 );//500000
-		affichageTableauRatio();
-		System.out.println("Fin programme!");
+		visualisationDynamique(data, graphe,900000 );//500000
+				affichageTableauRatio();
+				System.out.println("Fin programme!");
+				writeData("1donneeRatio900000.dat",tableauRatio );
 
 	}
 }
