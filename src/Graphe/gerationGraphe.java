@@ -29,6 +29,8 @@ public class gerationGraphe {
 	private static List<String> data;
 	private static Donnees donnees;
 	private static List<Double> tableauRatio=new ArrayList<Double>() ;
+	private static List<Double> distributionDegre=new ArrayList<Double>() ;
+
 
 	public   gerationGraphe(Graph graph) {}
 
@@ -118,7 +120,7 @@ public class gerationGraphe {
 		}
 		calculMetrique(graphe);
 		System.setProperty("org.graphstream.ui", "swing");
-		graphe.display();
+		//graphe.display();
 
 	}
 
@@ -166,7 +168,7 @@ public class gerationGraphe {
 		// affichage graphe dynamique
 		int debut=0;
 		int fin=0;
-		//graphe1.display();
+		graphe1.display();
 		if (separateur==",") {
 			debut=1289192400;
 			fin=1453438800;
@@ -191,7 +193,7 @@ public class gerationGraphe {
 					}
 				}
 			}
-			Thread.sleep( 10);
+			Thread.sleep( 1000);
 			//affichage nombre des noeuds graphe dynamique
 			//System.out.println("Nombre de noeud:"+graphe1.getNodeCount());
 			compter+=graphe1.getNodeCount();
@@ -268,6 +270,7 @@ public class gerationGraphe {
 		int[] tableauDistributionDegre=Toolkit.degreeDistribution(graph);
 		for (int i = 0; i < tableauDistributionDegre.length; i++) {
 			System.out.println(tableauDistributionDegre[i]);
+			distributionDegre.add(0.0+tableauDistributionDegre[i]);
 
 		}
 
@@ -308,6 +311,8 @@ public class gerationGraphe {
 			BufferedWriter bw = new BufferedWriter(fw);
 			for (int i = 0 ; i < tab.size() ; i++) {
 				bw.write(tab.get(i)+"");
+				//bw.write(i+" "+tab.get(i));
+
 				bw.newLine();
 			}
 			bw.close();
@@ -317,12 +322,17 @@ public class gerationGraphe {
 	}
 
 	public static void main(String[] args) throws Exception   {
-		analyse(1);
+		//choix de fichier 1 ou2
+		analyse(2);
+		//les visualisations
 		//visualisationStatique(data, graphe);
-		visualisationDynamique(data, graphe,900000 );//500000
-				affichageTableauRatio();
-				System.out.println("Fin programme!");
-				writeData("1donneeRatio900000.dat",tableauRatio );
+		visualisationDynamique(data, graphe,500000 );//500000
+		//affichageTableauRatio();
+		System.out.println("Fin programme!");
+		//writeData("1donneeRatio900000.dat",tableauRatio );
+		
+		//writeData("distributionDegre1.dat",distributionDegre );
+
 
 	}
 }
