@@ -21,7 +21,10 @@ public class gerationGraphe {
 	private final static String FILE_NAME_TXT = "Data/soc-sign-bitcoinalpha.txt";
 	private final static String FILE_NAME_CSV_MSG = "Data/data.csv";
 	private final static String FILE_NAME_TXT_MSG = "Data/data.txt";
+	private final static String FILE_NALE_EMAIL_EU_CSV = "Data/email-Eu-core-temporal.csv";
+	private final static String FILE_NALE_EMAIL_EU_TXT = "Data/email-Eu-core-temporal.txt";
 	private  static String separateur;
+	private static int id;
 
 
 
@@ -120,7 +123,7 @@ public class gerationGraphe {
 		}
 		calculMetrique(graphe);
 		System.setProperty("org.graphstream.ui", "swing");
-		//graphe.display();
+		graphe.display();
 
 	}
 
@@ -169,12 +172,15 @@ public class gerationGraphe {
 		int debut=0;
 		int fin=0;
 		graphe1.display();
-		if (separateur==",") {
+		if (separateur==","  && id==1) {
 			debut=1289192400;
 			fin=1453438800;
-		}else if(separateur==" ") {
+		}else if(separateur==" "  && id==2) {
 			debut=1082040961;
 			fin=1098777142;
+		} else if(separateur==" " && id==3) {
+			debut=0;
+			fin=69379200;
 		}
 		while(debut<=fin ) {
 			for (int i = 0; i < donnees.getTabDonnees().size(); i++) {
@@ -193,9 +199,11 @@ public class gerationGraphe {
 					}
 				}
 			}
-			Thread.sleep( 1000);
+			Thread.sleep( 1);
 			//affichage nombre des noeuds graphe dynamique
-			//System.out.println("Nombre de noeud:"+graphe1.getNodeCount());
+			System.out.println("Nombre de noeud:"+graphe1.getNodeCount());
+			System.out.println("Nombre de sommet:******************"+graphe1.getEdgeCount());
+
 			compter+=graphe1.getNodeCount();
 			//chargement graphe des graphe temporaire
 			if (demarrer==0) {
@@ -209,7 +217,7 @@ public class gerationGraphe {
 			graphe1.clear();
 			debut+=taille;
 		}
-		System.out.println("compter:"+compter);
+//		System.out.println("compter:"+compter);
 	}
 
 	//formule ratio: ((V1 - V0) + (V0 - V1)) / ((V1 union V0) - (V1 intersection V0))
@@ -281,15 +289,23 @@ public class gerationGraphe {
 		//FILE_NAME_CSV_MSG
 		//FILE_NAME_TXT_MSG
 		if (numeroAnalyse==1) {
+			id=numeroAnalyse;
 			separateur=",";
 			File f=getResource(FILE_NAME_CSV);
 			data = readFile(f);
 			transformationCsvEnTx(data,FILE_NAME_TXT,",");
 		}else if(numeroAnalyse==2) {
+			id=numeroAnalyse;
 			separateur=" ";
 			File f=getResource(FILE_NAME_CSV_MSG);
 			data = readFile(f);
 			transformationCsvEnTx(data,FILE_NAME_TXT_MSG," ");
+		} else if(numeroAnalyse==3) {
+			id=numeroAnalyse;
+			separateur=" ";
+			File f=getResource(FILE_NALE_EMAIL_EU_CSV);
+			data = readFile(f);
+			transformationCsvEnTx(data,FILE_NALE_EMAIL_EU_TXT," ");
 		}
 	}
 
@@ -322,16 +338,18 @@ public class gerationGraphe {
 	}
 
 	public static void main(String[] args) throws Exception   {
-		//choix de fichier 1 ou2
-		analyse(2);
+		//choix de fichier
+		analyse(3);
 		//les visualisations
 		//visualisationStatique(data, graphe);
-		visualisationDynamique(data, graphe,500000 );//500000
+		visualisationDynamique(data, graphe,86400);//500000
 		//affichageTableauRatio();
 		System.out.println("Fin programme!");
-		//writeData("1donneeRatio900000.dat",tableauRatio );
+		writeData("EU.dat",tableauRatio );
 		
 		//writeData("distributionDegre1.dat",distributionDegre );
+		
+
 
 
 	}
