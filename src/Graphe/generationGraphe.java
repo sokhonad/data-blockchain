@@ -15,7 +15,7 @@ import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.DefaultGraph;
 
 
-public class gerationGraphe {
+public class generationGraphe {
 
 	private final static String FILE_NAME_CSV = "Data/soc-sign-bitcoinalpha.csv";
 	private final static String FILE_NAME_TXT = "Data/soc-sign-bitcoinalpha.txt";
@@ -35,7 +35,7 @@ public class gerationGraphe {
 	private static List<Double> distributionDegre=new ArrayList<Double>() ;
 
 
-	public   gerationGraphe(Graph graph) {}
+	public   generationGraphe(Graph graph) {}
 
 	public static String getResourcePath(String fileName) {
 		final File f = new File("");
@@ -183,26 +183,38 @@ public class gerationGraphe {
 			fin=69379200;
 		}
 		while(debut<=fin ) {
+			System.out.println("************variable***************:"+debut/3600);
+			System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@variable@@@@@@@@@@@@:"+(debut+taille)/3600);
 			for (int i = 0; i < donnees.getTabDonnees().size(); i++) {
-				if (donnees.getTabDonnees().get(i).getTime()>=debut && donnees.getTabDonnees().get(i).getTime()<=debut+taille ) {//intervalle temps
+				if (donnees.getTabDonnees().get(i).getTime()>=debut/2 && donnees.getTabDonnees().get(i).getTime()<=debut+taille ) {//intervalle temps
 					if(graphe1.getNode(donnees.getTabDonnees().get(i).getSource())==null) {
 						graphe1.addNode(donnees.getTabDonnees().get(i).getSource());
+						//definition des positions
+//						graphe1.getNode(donnees.getTabDonnees().get(i).getSource()).setAttribute("x", donnees.getTabDonnees().get(i).getTime());
+//						graphe1.getNode(donnees.getTabDonnees().get(i).getSource()).setAttribute("y", donnees.getTabDonnees().get(i).getTime());
+//						
 
 					}
 					if(graphe1.getNode(donnees.getTabDonnees().get(i).getTarget())==null) {
 						graphe1.addNode(donnees.getTabDonnees().get(i).getTarget());
+//						//definition des positions
+//						graphe1.getNode(donnees.getTabDonnees().get(i).getSource()).setAttribute("x", donnees.getTabDonnees().get(i).getTime());
+//						graphe1.getNode(donnees.getTabDonnees().get(i).getSource()).setAttribute("y", donnees.getTabDonnees().get(i).getTime());
+//						
 
 					}
 					//ajout des sommets
 					if(graphe1.getEdge(donnees.getTabDonnees().get(i).getSource()+"-->"+donnees.getTabDonnees().get(i).getTarget())==null) {
 						graphe1.addEdge(donnees.getTabDonnees().get(i).getSource()+"-->"+donnees.getTabDonnees().get(i).getTarget(),donnees.getTabDonnees().get(i).getSource(),donnees.getTabDonnees().get(i).getTarget(),true);
 					}
+
+
 				}
 			}
-			Thread.sleep( 1);
+			Thread.sleep( 100);
 			//affichage nombre des noeuds graphe dynamique
 			System.out.println("Nombre de noeud:"+graphe1.getNodeCount());
-			System.out.println("Nombre de sommet:******************"+graphe1.getEdgeCount());
+			System.out.println("Nombre de arret:******************"+graphe1.getEdgeCount());
 
 			compter+=graphe1.getNodeCount();
 			//chargement graphe des graphe temporaire
@@ -215,7 +227,8 @@ public class gerationGraphe {
 			grapheTemp2=copie(graphe1);
 			demarrer=0;
 			graphe1.clear();
-			debut+=taille;
+			
+			debut+=(taille/2);
 		}
 //		System.out.println("compter:"+compter);
 	}
@@ -343,14 +356,10 @@ public class gerationGraphe {
 		//les visualisations
 		//visualisationStatique(data, graphe);
 		visualisationDynamique(data, graphe,86400);//500000
-		//affichageTableauRatio();
+		affichageTableauRatio();
 		System.out.println("Fin programme!");
 		writeData("EU.dat",tableauRatio );
 		
 		//writeData("distributionDegre1.dat",distributionDegre );
-		
-
-
-
 	}
 }
