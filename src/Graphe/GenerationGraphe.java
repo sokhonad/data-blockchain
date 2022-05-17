@@ -1,9 +1,7 @@
 package Graphe;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,7 +13,7 @@ import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.DefaultGraph;
 
 
-public class generationGraphe {
+public class GenerationGraphe {
 
 	private final static String FILE_NAME_CSV = "Data/soc-sign-bitcoinalpha.csv";
 	private final static String FILE_NAME_TXT = "Data/soc-sign-bitcoinalpha.txt";
@@ -28,106 +26,55 @@ public class generationGraphe {
 
 
 
-	private  static Graph graphe;
+	private Graph graphe;
 	private static List<String> data;
 	private static Donnees donnees;
 	private static List<Double> tableauRatio=new ArrayList<Double>() ;
+	private static List<Double> taNbSommetCourant=new ArrayList<Double>() ;
+	private static List<Double> tabNbArretCourant=new ArrayList<Double>() ;
+
+
 	private static List<Double> distributionDegre=new ArrayList<Double>() ;
 
 
-	public   generationGraphe(Graph graph) {}
-
-	public static String getResourcePath(String fileName) {
-		final File f = new File("");
-		final String dossierPath = f.getAbsolutePath() + File.separator + fileName;
-		return dossierPath;
-	}
-
-	public static File getResource(String fileName) {
-		final String completeFileName = getResourcePath(fileName);
-		File file = new File(completeFileName);
-		return file;
-	}
-
-
-	public static List<String> readFile(File file) throws Exception {
-
-		List<String> result = new ArrayList<String>();
-
-		FileReader fr = new FileReader(file);
-		BufferedReader br = new BufferedReader(fr);
-
-		for (String line = br.readLine(); line != null; line = br.readLine()) {
-			result.add(line);
-		}
-
-		br.close();
-		fr.close();
-
-		return result;
-	}
-	public static void transformationCsvEnTx(List<String> tab,String filename,String separateur) throws Exception  {
-		String filepath = System.getProperty("user.dir") + File.separator + filename;
-		FileWriter fileWriter = new FileWriter(filepath);
-		BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-
-		for (int i = 0; i < tab.size(); i++) {
-			String b=tab.get(i);
-			if (separateur==",") {
-				String[] ligne = b.split(",");          
-				for (int j = 0; j < ligne.length; j++) {
-					if(j<=1 || j==3) {
-						StringBuilder line = new StringBuilder();
-						line.append(ligne[j]).append(" ");
-						bufferedWriter.write(line + "");
-					}
-				}	
-			}else {
-				String[] ligne = b.split(" ");          
-				for (int j = 0; j < ligne.length; j++) {
-					StringBuilder line = new StringBuilder();
-					line.append(ligne[j]).append(" ");
-					bufferedWriter.write(line + "");
-
-				}
-			}
-
-			bufferedWriter.newLine();
-
-		}
-		bufferedWriter.close();
-
-	}
-
-	public static void visualisationStatique(List<String> tab,Graph graphe) throws Exception  {
+	public   GenerationGraphe() {
 		graphe=new DefaultGraph("graphe");
-		for (int i = 0; i < tab.size(); i++) {
-			String b=tab.get(i);
+
+	}
+	public Graph getGraphe() {
+		return graphe;
+	}
+
+
+
+	public  void visualisationStatique() throws Exception  {
+		for (int i = 0; i < data.size(); i++) {
+			String b=data.get(i);
 			String[] ligne = b.split(separateur);
-			if(graphe.getNode(ligne[1])==null) {
+			if(this.getGraphe().getNode(ligne[1])==null) {
 				graphe.addNode(ligne[1]);
 
 			}
-			if(graphe.getNode(ligne[0])==null) {
-				graphe.addNode(ligne[0]);
+			if(this.getGraphe().getNode(ligne[0])==null) {
+				this.getGraphe().addNode(ligne[0]);
 
 			}
 		}
 
-		for (int i = 0; i < tab.size(); i++) {
-			String b=tab.get(i);
+		for (int i = 0; i < data.size(); i++) {
+			String b=data.get(i);
 			String[] ligne = b.split(separateur);
-			if(graphe.getEdge(ligne[0]+"-->"+ligne[1])==null) {
-				graphe.addEdge(ligne[0]+"-->"+ligne[1],ligne[0],ligne[1],true);
+			if(this.getGraphe().getEdge(ligne[0]+"-->"+ligne[1])==null) {
+				this.getGraphe().addEdge(ligne[0]+"-->"+ligne[1],ligne[0],ligne[1],true);
 			}
 		}
-		calculMetrique(graphe);
+		calculMetrique(this.getGraphe());
 		System.setProperty("org.graphstream.ui", "swing");
-		graphe.display();
+		this.getGraphe().display();
 
 	}
 
-	public static void visualisationDynamique(List<String> tab,Graph graphe,int taille) throws Exception  {
+	public  void visualisationDynamique(int taille,int devision) throws Exception  {
 		//les graphes temporaire
 		Graph grapheTemp1=null;
 		Graph grapheTemp2=null;
@@ -136,25 +83,24 @@ public class generationGraphe {
 		int compter=0;
 		//ajout des noeuds
 		donnees=new Donnees();
-		graphe=new DefaultGraph("graphe");
-		for (int i = 0; i < tab.size(); i++) {
-			String b=tab.get(i);
+		for (int i = 0; i < data.size(); i++) {
+			String b=data.get(i);
 			String[] ligne = b.split(separateur);
-			if(graphe.getNode(ligne[1])==null) {
-				graphe.addNode(ligne[1]);
+			if(this.getGraphe().getNode(ligne[1])==null) {
+				this.getGraphe().addNode(ligne[1]);
 
 			}
-			if(graphe.getNode(ligne[0])==null) {
-				graphe.addNode(ligne[0]);
+			if(this.getGraphe().getNode(ligne[0])==null) {
+				this.getGraphe().addNode(ligne[0]);
 
 			}
 		}
 		//ajout des sommets
-		for (int i = 0; i < tab.size(); i++) {
-			String b=tab.get(i);
+		for (int i = 0; i < data.size(); i++) {
+			String b=data.get(i);
 			String[] ligne = b.split(separateur);
-			if(graphe.getEdge(ligne[0]+"-->"+ligne[1])==null) {
-				graphe.addEdge(ligne[0]+"-->"+ligne[1],ligne[0],ligne[1],true);
+			if(this.getGraphe().getEdge(ligne[0]+"-->"+ligne[1])==null) {
+				this.getGraphe().addEdge(ligne[0]+"-->"+ligne[1],ligne[0],ligne[1],true);
 				if (separateur==",") {
 					donnees.init(ligne[0], ligne[1], ligne[2], ligne[3]);
 
@@ -171,7 +117,7 @@ public class generationGraphe {
 		// affichage graphe dynamique
 		int debut=0;
 		int fin=0;
-		graphe1.display();
+		//graphe1.display();
 		if (separateur==","  && id==1) {
 			debut=1289192400;
 			fin=1453438800;
@@ -186,22 +132,12 @@ public class generationGraphe {
 			System.out.println("************variable***************:"+debut/3600);
 			System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@variable@@@@@@@@@@@@:"+(debut+taille)/3600);
 			for (int i = 0; i < donnees.getTabDonnees().size(); i++) {
-				if (donnees.getTabDonnees().get(i).getTime()>=debut/2 && donnees.getTabDonnees().get(i).getTime()<=debut+taille ) {//intervalle temps
+				if (donnees.getTabDonnees().get(i).getTime()>=debut/devision && donnees.getTabDonnees().get(i).getTime()<=debut+taille ) {//intervalle temps
 					if(graphe1.getNode(donnees.getTabDonnees().get(i).getSource())==null) {
 						graphe1.addNode(donnees.getTabDonnees().get(i).getSource());
-						//definition des positions
-//						graphe1.getNode(donnees.getTabDonnees().get(i).getSource()).setAttribute("x", donnees.getTabDonnees().get(i).getTime());
-//						graphe1.getNode(donnees.getTabDonnees().get(i).getSource()).setAttribute("y", donnees.getTabDonnees().get(i).getTime());
-//						
-
 					}
 					if(graphe1.getNode(donnees.getTabDonnees().get(i).getTarget())==null) {
 						graphe1.addNode(donnees.getTabDonnees().get(i).getTarget());
-//						//definition des positions
-//						graphe1.getNode(donnees.getTabDonnees().get(i).getSource()).setAttribute("x", donnees.getTabDonnees().get(i).getTime());
-//						graphe1.getNode(donnees.getTabDonnees().get(i).getSource()).setAttribute("y", donnees.getTabDonnees().get(i).getTime());
-//						
-
 					}
 					//ajout des sommets
 					if(graphe1.getEdge(donnees.getTabDonnees().get(i).getSource()+"-->"+donnees.getTabDonnees().get(i).getTarget())==null) {
@@ -211,9 +147,11 @@ public class generationGraphe {
 
 				}
 			}
-			Thread.sleep( 100);
+			Thread.sleep( 1);
 			//affichage nombre des noeuds graphe dynamique
 			System.out.println("Nombre de noeud:"+graphe1.getNodeCount());
+			taNbSommetCourant.add((double) graphe1.getNodeCount());
+			tabNbArretCourant.add((double) graphe1.getEdgeCount());
 			System.out.println("Nombre de arret:******************"+graphe1.getEdgeCount());
 
 			compter+=graphe1.getNodeCount();
@@ -227,10 +165,10 @@ public class generationGraphe {
 			grapheTemp2=copie(graphe1);
 			demarrer=0;
 			graphe1.clear();
-			
-			debut+=(taille/2);
+
+			debut+=(taille/devision);
 		}
-//		System.out.println("compter:"+compter);
+		//		System.out.println("compter:"+compter);
 	}
 
 	//formule ratio: ((V1 - V0) + (V0 - V1)) / ((V1 union V0) - (V1 intersection V0))
@@ -279,7 +217,7 @@ public class generationGraphe {
 	}
 
 
-	public static void calculMetrique( Graph graph) {
+	public  void calculMetrique( Graph graph) {
 		System.out.println("Nombre de nœuds: "+graph.getNodeCount());
 		System.out.println("Nombre de liens: "+graph.getEdgeCount());
 		System.out.println("Degré moyen: "+Toolkit.averageDegree(graph));
@@ -298,38 +236,37 @@ public class generationGraphe {
 	}
 
 	@SuppressWarnings("unused")
-	private static void analyse(int numeroAnalyse) throws Exception {
-		//FILE_NAME_CSV_MSG
-		//FILE_NAME_TXT_MSG
+	public  void analyse(int numeroAnalyse) throws Exception {
+		Fichier fichier=new Fichier();
 		if (numeroAnalyse==1) {
 			id=numeroAnalyse;
 			separateur=",";
-			File f=getResource(FILE_NAME_CSV);
-			data = readFile(f);
-			transformationCsvEnTx(data,FILE_NAME_TXT,",");
+			File f=fichier.getResource(FILE_NAME_CSV);
+			data = fichier.readFile(f);
+			fichier.transformationCsvEnTx(data,FILE_NAME_TXT,",");
 		}else if(numeroAnalyse==2) {
 			id=numeroAnalyse;
 			separateur=" ";
-			File f=getResource(FILE_NAME_CSV_MSG);
-			data = readFile(f);
-			transformationCsvEnTx(data,FILE_NAME_TXT_MSG," ");
+			File f=fichier.getResource(FILE_NAME_CSV_MSG);
+			data = fichier.readFile(f);
+			fichier.transformationCsvEnTx(data,FILE_NAME_TXT_MSG," ");
 		} else if(numeroAnalyse==3) {
 			id=numeroAnalyse;
 			separateur=" ";
-			File f=getResource(FILE_NALE_EMAIL_EU_CSV);
-			data = readFile(f);
-			transformationCsvEnTx(data,FILE_NALE_EMAIL_EU_TXT," ");
+			File f=fichier.getResource(FILE_NALE_EMAIL_EU_CSV);
+			data = fichier.readFile(f);
+			fichier.transformationCsvEnTx(data,FILE_NALE_EMAIL_EU_TXT," ");
 		}
 	}
 
-	private static void affichageTableauRatio() {
+	public  void affichageTableauRatio() {
 		for (int i = 0; i < tableauRatio.size(); i++) {
 			System.out.println(tableauRatio.get(i));
 		}
 		System.out.println("La taille tableauRatio: "+tableauRatio.size());
 	}
 
-	public static void writeData(String filename, List<Double> tab) {
+	public  void writeData(String filename) {
 		try {
 			File file = new File(System.getProperty("user.dir") + "/" + filename);
 			// créer le fichier s'il n'existe pas
@@ -338,8 +275,8 @@ public class generationGraphe {
 			}
 			FileWriter fw = new FileWriter(file.getAbsoluteFile());
 			BufferedWriter bw = new BufferedWriter(fw);
-			for (int i = 0 ; i < tab.size() ; i++) {
-				bw.write(tab.get(i)+"");
+			for (int i = 0 ; i < tableauRatio.size() ; i++) {
+				bw.write(tableauRatio.get(i)+"");
 				//bw.write(i+" "+tab.get(i));
 
 				bw.newLine();
@@ -350,16 +287,4 @@ public class generationGraphe {
 		}
 	}
 
-	public static void main(String[] args) throws Exception   {
-		//choix de fichier
-		analyse(3);
-		//les visualisations
-		//visualisationStatique(data, graphe);
-		visualisationDynamique(data, graphe,86400);//500000
-		affichageTableauRatio();
-		System.out.println("Fin programme!");
-		writeData("EU.dat",tableauRatio );
-		
-		//writeData("distributionDegre1.dat",distributionDegre );
-	}
 }
